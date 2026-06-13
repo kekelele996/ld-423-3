@@ -19,6 +19,7 @@ export const useChartStore = create<ChartState>((set, get) => ({
     const persisted = await db.charts.toArray();
     if (persisted.length === 0) {
       await db.charts.put(sampleChart);
+      set({ charts: [sampleChart], selectedChartId: sampleChart.id });
       return;
     }
     set({ charts: persisted, selectedChartId: persisted[0].id });

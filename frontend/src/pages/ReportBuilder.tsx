@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { DraggableGrid } from '../components/common/DraggableGrid';
 import { useChartStore } from '../stores/chartStore';
+import { useDatasetStore } from '../stores/datasetStore';
 import { useReportStore } from '../stores/reportStore';
 
 export const ReportBuilder = () => {
@@ -7,7 +9,16 @@ export const ReportBuilder = () => {
   const reports = useReportStore((state) => state.reports);
   const activeReportId = useReportStore((state) => state.activeReportId);
   const saveReport = useReportStore((state) => state.saveReport);
+  const loadCharts = useChartStore((state) => state.loadCharts);
+  const loadDatasets = useDatasetStore((state) => state.loadDatasets);
+  const loadReports = useReportStore((state) => state.loadReports);
   const report = reports.find((candidate) => candidate.id === activeReportId) ?? reports[0];
+
+  useEffect(() => {
+    void loadDatasets();
+    void loadCharts();
+    void loadReports();
+  }, [loadDatasets, loadCharts, loadReports]);
 
   return (
     <main className="page">

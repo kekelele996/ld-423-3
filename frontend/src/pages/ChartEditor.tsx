@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ChartType, ColorScheme } from '../types';
 import { ChartPreview } from '../components/common/ChartPreview';
 import { ColorPicker } from '../components/common/ColorPicker';
@@ -9,21 +10,54 @@ import { useChartStore } from '../stores/chartStore';
 import { useDatasetStore } from '../stores/datasetStore';
 
 export const ChartEditor = () => {
+  const navigate = useNavigate();
+  const { chartId } = useParams<{ chartId: string }>();
   const datasets = useDatasetStore((state) => state.datasets);
+  const loadDatasets = useDatasetStore((state) => state.loadDatasets);
   const selectedDatasetId = useDatasetStore((state) => state.selectedDatasetId);
   const selectDataset = useDatasetStore((state) => state.selectDataset);
   const charts = useChartStore((state) => state.charts);
+  const selectedChartId = useChartStore((state) => state.selectedChartId);
+  const loadCharts = useChartStore((state) => state.loadCharts);
   const saveChart = useChartStore((state) => state.saveChart);
+  const selectChart = useChartStore((state) => state.selectChart);
   const dataset = datasets.find((candidate) => candidate.id === selectedDatasetId) ?? datasets[0];
   const { suggestedConfig, validateConfig } = useChartConfig(dataset);
   const [config, setConfig] = useState(suggestedConfig);
   const errors = useMemo(() => (config ? validateConfig(config) : []), [config, validateConfig]);
 
   useEffect(() => {
+    void loadDatasets();
+    void loadCharts();
+  }, [loadDatasets, loadCharts]);
+
+  useEffect(() => {
+    if (chartId) {
+      const matched = charts.find((candidate) => candidate.id === chartId);
+      if (matched) {
+        setConfig(matched);
+        selectChart(matched.id);
+        if (matched.datasetId !== selectedDatasetId && datasets.some((d) => d.id === matched.datasetId)) {
+          selectDataset(matched.datasetId);
+        }
+      }
+    }
+  }, [chartId, charts, datasets, selectedDatasetId, selectChart, selectDataset]);
+
+  useEffect(() => {
     if (!config && suggestedConfig) setConfig(suggestedConfig);
   }, [config, suggestedConfig]);
 
   if (!config || !dataset) return null;
+
+  const loadSavedChart = (chartIdParam: string) => {
+    navigate(`/chart-editor/${chartIdParam}`);
+  };
+
+  const startNewChart = () => {
+    navigate('/chart-editor');
+    if (suggestedConfig) setConfig(suggestedConfig);
+  };
 
   return (
     <main className="page editor-grid">
@@ -74,7 +108,20 @@ export const ChartEditor = () => {
         {errors.map((error) => <div className="error-box" key={error}>{error}</div>)}
         <button className="primary-action" type="button" onClick={() => saveChart(config)}>保存图表</button>
         <div className="saved-list">
-          {charts.map((chart) => <span key={chart.id}>{chart.name}</span>)}
+          <div className="panel-heading">
+            <h3>已保存图表</h3>
+            <button type="button" onClick={startNewChart}>新建</button>
+          </div>
+          {charts.map((chart) => (
+            <button
+              key={chart.id}
+              className={`palette ${chart.id === (chartId ?? selectedChartId) ? 'is-active' : ''}`}
+              onClick={() => loadSavedChart(chart.id)}
+            >
+              <span>{chart.name}</span>
+              <span>{chart.tags.length} 标签</span>
+            </button>
+          ))}
         </div>
       </aside>
     </main>

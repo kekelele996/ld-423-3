@@ -28,6 +28,7 @@ export const useReportStore = create<ReportState>((set, get) => ({
     const persisted = await db.reports.toArray();
     if (persisted.length === 0) {
       await db.reports.put(demoReport);
+      set({ reports: [demoReport], activeReportId: demoReport.id });
       return;
     }
     set({ reports: persisted, activeReportId: persisted[0].id });

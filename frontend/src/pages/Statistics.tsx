@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DataGrid } from '../components/common/DataGrid';
 import { FieldSelector } from '../components/common/FieldSelector';
 import { StatCard } from '../components/common/StatCard';
@@ -8,7 +8,13 @@ import { DataType } from '../types';
 
 export const Statistics = () => {
   const datasets = useDatasetStore((state) => state.datasets);
+  const loadDatasets = useDatasetStore((state) => state.loadDatasets);
   const dataset = datasets[0];
+
+  useEffect(() => {
+    void loadDatasets();
+  }, [loadDatasets]);
+
   const numericColumns = dataset.columns.filter((column) => column.type === 'Number');
   const [field, setField] = useState(numericColumns[0]?.name ?? '');
   const summary = useMemo(() => calculateStatSummary(dataset.id, dataset.data, field), [dataset, field]);

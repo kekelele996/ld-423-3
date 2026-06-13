@@ -49,6 +49,8 @@ input, select { width: 100%; border: 1px solid var(--line); background: var(--su
 .report-canvas { min-height: 520px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; padding: 18px; border: 1px dashed var(--line); }
 .report-canvas.is-over { border-color: var(--accent); background: color-mix(in oklch, var(--accent) 9%, var(--surface)); }
 .report-tile, .gallery-item { padding: 14px; }
+.gallery-item { cursor: pointer; transition: border-color .15s ease, box-shadow .15s ease; }
+.gallery-item:hover { border-color: var(--accent); box-shadow: 0 2px 12px color-mix(in oklch, var(--accent) 15%, transparent); }
 .gallery-grid { grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); }
 .search-input { max-width: 340px; }
 .error-box { border-color: var(--danger); color: var(--danger); padding: 12px; margin-bottom: 14px; }

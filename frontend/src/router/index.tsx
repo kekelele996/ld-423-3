@@ -33,6 +33,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/workspace" replace /> },
       { path: 'workspace', element: <Workspace /> },
       { path: 'chart-editor', element: <ChartEditor /> },
+      { path: 'chart-editor/:chartId', element: <ChartEditor /> },
       { path: 'report-builder', element: <ReportBuilder /> },
       { path: 'statistics', element: <Statistics /> },
       { path: 'charts', element: <ChartGallery /> },

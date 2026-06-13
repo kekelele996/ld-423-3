@@ -1,14 +1,23 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChartPreview } from '../components/common/ChartPreview';
 import { EmptyState } from '../components/common/EmptyState';
 import { useChartStore } from '../stores/chartStore';
 import { useDatasetStore } from '../stores/datasetStore';
 
 export const ChartGallery = () => {
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const charts = useChartStore((state) => state.charts);
   const datasets = useDatasetStore((state) => state.datasets);
+  const loadCharts = useChartStore((state) => state.loadCharts);
+  const loadDatasets = useDatasetStore((state) => state.loadDatasets);
+
+  useEffect(() => {
+    void loadDatasets();
+    void loadCharts();
+  }, [loadDatasets, loadCharts]);
 
   const allTags = useMemo(() => {
     const tagSet = new Set<string>();
@@ -28,6 +37,10 @@ export const ChartGallery = () => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
+  };
+
+  const openInEditor = (chartId: string) => {
+    navigate(`/chart-editor/${chartId}`);
   };
 
   return (
@@ -57,7 +70,7 @@ export const ChartGallery = () => {
       ) : (
         <section className="gallery-grid">
           {visible.map((chart) => (
-            <article className="gallery-item" key={chart.id}>
+            <article className="gallery-item" key={chart.id} onClick={() => openInEditor(chart.id)}>
               <ChartPreview config={chart} dataset={datasets.find((dataset) => dataset.id === chart.datasetId)} compact />
               <strong>{chart.name}</strong>
               <span>{chart.type} · {chart.colorScheme}</span>

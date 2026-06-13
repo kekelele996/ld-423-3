@@ -21,6 +21,7 @@ export const useDatasetStore = create<DatasetState>((set, get) => ({
     const persisted = await db.datasets.toArray();
     if (persisted.length === 0) {
       await db.datasets.put(sampleDataset);
+      set({ datasets: [sampleDataset], selectedDatasetId: sampleDataset.id });
       return;
     }
     set({ datasets: persisted, selectedDatasetId: persisted[0].id });
