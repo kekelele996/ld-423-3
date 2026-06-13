@@ -3,6 +3,7 @@ import { DataType } from '../types';
 import { DataGrid } from '../components/common/DataGrid';
 import { FilterPanel } from '../components/common/FilterPanel';
 import { EmptyState } from '../components/common/EmptyState';
+import { TagInput } from '../components/common/TagInput';
 import { useDataImport } from '../hooks/useDataImport';
 import { useDatasetStore } from '../stores/datasetStore';
 
@@ -14,6 +15,8 @@ export const Workspace = () => {
   const addDataset = useDatasetStore((state) => state.addDataset);
   const selectDataset = useDatasetStore((state) => state.selectDataset);
   const updateColumnType = useDatasetStore((state) => state.updateColumnType);
+  const addDatasetTag = useDatasetStore((state) => state.addDatasetTag);
+  const removeDatasetTag = useDatasetStore((state) => state.removeDatasetTag);
   const dataset = datasets.find((candidate) => candidate.id === selectedDatasetId);
 
   useEffect(() => {
@@ -49,10 +52,26 @@ export const Workspace = () => {
               <button key={candidate.id} className={candidate.id === dataset.id ? 'is-active' : ''} onClick={() => selectDataset(candidate.id)}>
                 <strong>{candidate.name}</strong>
                 <span>{candidate.rowCount} 行 · {candidate.columnCount} 列</span>
+                {candidate.tags.length > 0 && (
+                  <div className="dataset-tags">
+                    {candidate.tags.slice(0, 3).map((tag) => (
+                      <span key={tag} className="tag">{tag}</span>
+                    ))}
+                  </div>
+                )}
               </button>
             ))}
           </aside>
           <section className="data-panel">
+            <div className="dataset-detail-tags">
+              <h3>数据集标签</h3>
+              <TagInput
+                tags={dataset.tags}
+                onAdd={(tag) => addDatasetTag(dataset.id, tag)}
+                onRemove={(tag) => removeDatasetTag(dataset.id, tag)}
+                placeholder="输入标签后按回车添加"
+              />
+            </div>
             <div className="column-editor">
               {dataset.columns.map((column) => (
                 <label key={column.name}>

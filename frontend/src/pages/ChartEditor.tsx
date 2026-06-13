@@ -3,6 +3,7 @@ import { ChartType, ColorScheme } from '../types';
 import { ChartPreview } from '../components/common/ChartPreview';
 import { ColorPicker } from '../components/common/ColorPicker';
 import { FieldSelector } from '../components/common/FieldSelector';
+import { TagInput } from '../components/common/TagInput';
 import { useChartConfig } from '../hooks/useChartConfig';
 import { useChartStore } from '../stores/chartStore';
 import { useDatasetStore } from '../stores/datasetStore';
@@ -61,6 +62,15 @@ export const ChartEditor = () => {
           </select>
         </label>
         <ColorPicker value={config.colorScheme} onChange={(colorScheme: ColorScheme) => setConfig({ ...config, colorScheme })} />
+        <div className="field-control">
+          <span>图表标签</span>
+          <TagInput
+            tags={config.tags}
+            onAdd={(tag) => setConfig({ ...config, tags: [...config.tags, tag] })}
+            onRemove={(tag) => setConfig({ ...config, tags: config.tags.filter((t) => t !== tag) })}
+            placeholder="输入标签后按回车添加"
+          />
+        </div>
         {errors.map((error) => <div className="error-box" key={error}>{error}</div>)}
         <button className="primary-action" type="button" onClick={() => saveChart(config)}>保存图表</button>
         <div className="saved-list">
